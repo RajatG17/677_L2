@@ -1,0 +1,50 @@
+// Catalog Service Definition
+service Catalog{
+
+    // lookup method for communication between front end server or order service and catalog service 
+    rpc lookup (lookupRequestMessage) returns (lookupResponseMessage);
+
+    // buy method (order service to catalog service)
+    rpc buy_or_sell_stock (orderRequestMessage) returns (orderResponseMessage);
+    
+}
+
+message lookupRequestMessage{
+    required string stockname = 1;
+}
+
+message lookupResponseMessage{
+    optional bool error = 1;
+    optional string stockname = 2;
+    optional float price = 3;
+    optional int32 quantity = 4;
+}
+
+message orderRequestMessage{
+    required string stockname = 1;
+    required int32 quantity = 2;
+    required string type = 3;
+}
+
+message orderResponseMessage{
+    optional bool error = 1;
+}
+
+// Order Service Definition
+service Order{
+
+    // trade method for communication between front-end server and order service
+    rpc trade(tradeRequestMessage) returns (tradeResponseMessage);
+}
+
+message tradeRequestMessage{
+    required string stockname = 1;
+    required int32 quantity = 2;
+    required string type = 3;
+}
+
+message tradeResponseMessage{
+    optional bool error = 1;
+    optional int32 transaction_number = 2;
+
+}
