@@ -13,8 +13,18 @@ message lookupRequestMessage{
     required string stockname = 1;
 }
 
+enum ERROR_CODES{
+    NO_ERROR = 0;
+    INVALID_STOCKNAME = 1;
+    INTERNAL_ERROR = 2;
+    INSUFFICIENT_QUANTITY = 3;
+    INVALID_REQUEST = 4;
+}
+
+
+
 message lookupResponseMessage{
-    optional bool error = 1;
+    required ERROR_CODES error = 1;
     optional string stockname = 2;
     optional float price = 3;
     optional int32 quantity = 4;
@@ -27,7 +37,7 @@ message orderRequestMessage{
 }
 
 message orderResponseMessage{
-    optional bool error = 1;
+    required ERROR_CODES error = 1;
 }
 
 // Order Service Definition
@@ -44,7 +54,7 @@ message tradeRequestMessage{
 }
 
 message tradeResponseMessage{
-    optional bool error = 1;
+    required ERROR_CODES error = 1;
     optional int32 transaction_number = 2;
 
 }
