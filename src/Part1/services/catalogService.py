@@ -19,10 +19,6 @@ class CatalogService(pb2_grpc.CatalogServicer):
         self.lock = rwlock.RWLockRead()
         # load data
         self.data_file = pd.read_csv("./data/stock_data.csv")
-        try:
-            self.order_channel = grpc.insecure_channel("[::]:6001")
-        except:
-            print("Error creating a channel to order service")
 
     def lookup(self, request, context):
         try:
