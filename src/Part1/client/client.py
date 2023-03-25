@@ -34,8 +34,8 @@ if __name__ == "__main__":
 				conn.request("GET", url)						
 				response = conn.getresponse()
 				data = response.read()
-				print("response.status, response.reason : ")
-				print(response.status, response.reason)
+				print("response.status, response.reason, response.version : ")
+				print(response.status, response.reason, response.version)
 			else:
 				# Send Trade request
 				print ("Sending Trade request..")
@@ -48,8 +48,8 @@ if __name__ == "__main__":
 				conn.request("POST", url, body, headers)
 				response = conn.getresponse()
 				data = response.read()
-				print("response.status, response.reason : ")
-				print(response.status, response.reason)
+				print("response.status, response.reason, response.version : ")
+				print(response.status, response.reason, response.version)
 				print("data: ")
 				print(data)
 		# Close the HTTP connection

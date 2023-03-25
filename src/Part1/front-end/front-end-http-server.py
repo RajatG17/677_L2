@@ -9,9 +9,15 @@ from proto import service_rpc_pb2 as pb2
 from urllib.parse import urlparse
 import json
 from sys import argv
+import threading
 
 class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 	protocol_version = 'HTTP/1.1'
+
+	def handle_one_request(self):
+		super(MyHTTPHandlerClass, self).handle_one_request()
+		print ("cur_thread: " + threading.current_thread().name)
+		print ("client address_string: " + str(self.client_address))
 
 	# Method to encode a JSON string into bytes 
 	def convert_json_string(self, json_str):
