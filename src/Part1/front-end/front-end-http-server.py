@@ -2,15 +2,13 @@ import sys
 sys.path.append("..")
 
 import http.server
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler, ThreadingHTTPServer
 import grpc
 from proto import service_rpc_pb2_grpc as pb2_grpc
 from proto import service_rpc_pb2 as pb2 
 from urllib.parse import urlparse
 import json
 from sys import argv
-
-MAX_WORKER_THRESHOLD = 3
 
 class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 	protocol_version = 'HTTP/1.1'
@@ -125,15 +123,15 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 			self.create_and_send_response(400, "application/json", str(len(response)), response)
 
 if __name__ == "__main__":
+
 	if len(argv) == 2:
 		port=int(argv[1])
 		print("Running Front-End Service on port:" + str(port))
-		http_server = HTTPServer(('localhost', port), MyHTTPHandlerClass) 
+		http_server = ThreadingHTTPServer(('localhost', port), MyHTTPHandlerClass)
 		http_server.serve_forever()
-		run(port)
 	elif len(argv) == 1:
 		print("Running Front-End Service on port:" + "4000")
-		http_server = HTTPServer(('localhost', 4000), MyHTTPHandlerClass)
+		http_server = ThreadingHTTPServer(('localhost', 4000), MyHTTPHandlerClass)
 		http_server.serve_forever()
 	else:
 		print ("Invalid arguments, can optionally provide port number as argument")
