@@ -92,7 +92,7 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 		length = int(self.headers["Content-Length"])
 		request = json.loads(self.rfile.read(length).decode('utf-8'))
 
-		if ("name" not in request or "quantity" not in request or "type" not in request):
+		if (self.headers["Content-type"] != "application/json" or "name" not in request or "quantity" not in request or "type" not in request):
 			print ("Invalid POST request - JSON object should contain the keys \"name\", \"quantity\" and \"type\"")
 			#If the POST request was not successful, return JSON reply with a top-level error object
 			json_str = json.dumps({"error": {"code": 400, "message": "stock could not be traded"}})
