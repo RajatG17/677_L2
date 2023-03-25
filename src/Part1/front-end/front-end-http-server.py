@@ -124,15 +124,21 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
 
-	if len(argv) == 2:
-		port=int(argv[1])
-		print("Running Front-End Service on port:" + str(port))
-		http_server = ThreadingHTTPServer(('localhost', port), MyHTTPHandlerClass)
-		http_server.serve_forever()
-	elif len(argv) == 1:
-		print("Running Front-End Service on port:" + "4000")
-		http_server = ThreadingHTTPServer(('localhost', 4000), MyHTTPHandlerClass)
+	if (len(argv) >= 1 and len(argv) <= 3): 
+		if len(argv) == 1:
+			host = '127.0.0.1'
+			port = 4000
+		elif len(argv) == 2:
+			host = '127.0.0.1'
+			port=int(argv[1])
+		elif len(argv) == 3:
+			host = argv[1]
+			port=int(argv[2])
+		print("Running Front-End Service on host: " + host + " , port:" + str(port))
+		http_server = ThreadingHTTPServer((host, port), MyHTTPHandlerClass)
 		http_server.serve_forever()
 	else:
-		print ("Invalid arguments, can optionally provide port number as argument")
-
+		print ("Invalid arguments") 
+		print ("To run on a given host and port enter command: \"python3 front-end-http-server.py <host> <port>\"")
+		print ("To run on localhost on a given port enter command: \"python3 front-end-http-server.py <port>\"")
+		print ("To run on localhost and default port 4000 enter command: \"python3 front-end-http-server.py\"")

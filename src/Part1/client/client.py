@@ -5,12 +5,25 @@ import random
 import http.client
 
 if __name__ == "__main__":
-	conn = http.client.HTTPConnection("localhost", 4000)
-	stock_names = ["GameStart", "FishCo", "MenhirCo", "BoarCo"]
-	trade_types = ["buy", "sell"]
+	if (len(argv) >= 2 and len(argv) <= 4):
+		if (len(argv) == 2):
+			host = '127.0.0.1'
+			port = 4000 
+			p = float(argv[1])
+		elif (len(argv) == 3):
+			host = '127.0.0.1'
+			port = int(argv[1])
+			p = float(argv[2])
+		else:
+			host = argv[1]
+			port = int(argv[2])
+			p = float(argv[3])
+		
+		print ("Client establishing server connection at host: " + host + " , port: " + str(port))
+		conn = http.client.HTTPConnection(host, port)
+		stock_names = ["GameStart", "FishCo", "MenhirCo", "BoarCo"]
+		trade_types = ["buy", "sell"]
 
-	if len(argv) == 2:
-		p = float(argv[1])
 		while (True):
 			name = stock_names[random.randint(0, 3)]
 			prob = random.random()
@@ -39,8 +52,12 @@ if __name__ == "__main__":
 				print(response.status, response.reason)
 				print("data: ")
 				print(data)
+		# Close the HTTP connection
+		conn.close()
 	else:
-		print("Invalid command-line arguments, enter p in range[0, 1]")
+		print ("Invalid arguments")
+		print ("To connect with server on a given host and port enter command: \"python3 client.py <host> <port> <p>\"")
+		print ("To connect with server at localhost on a given port enter command: \"python3 client.py <port> <p>\"")
+		print ("To connect with server at localhost and default port 4000 enter command: \"python3 client.py <p>\"")
+		print ("p should be in range[0, 1]")
 	
-	# Close the HTTP connection
-	conn.close()
