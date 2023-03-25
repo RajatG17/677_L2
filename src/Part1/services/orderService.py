@@ -11,6 +11,15 @@ MAX_WORKER_THRESHOLD = 3
 #unique trtansaction for every order
 transaction_number = 0
 
+# get last transaction number from log file if it exists
+with open("../data/transaction_logs.txt", "r") as file:
+    try:
+        last_line = file.readlines()[-1]
+        if last_line:
+            last_line_word = int(last_line.split(" ")[0]) if last_line else 0
+            transaction_number = last_line_word
+    except:        
+        pass
 
 class OrderService(pb2_grpc.OrderServicer):
     def __init__(self):
@@ -30,7 +39,6 @@ class OrderService(pb2_grpc.OrderServicer):
             stockname = request.stockname
             quantity= request.quantity
             order_type = request.type
-            print("inside order service")
 
             # return error order type is invalid (other than buy/sell)
             if order_type.lower() not in ["buy", "sell"]:
@@ -40,7 +48,7 @@ class OrderService(pb2_grpc.OrderServicer):
             
             # make lookup call to catalog service
             result = catalogService.lookup(pb2.lookupRequestMessage(stockname=stockname))
-            print(result)
+            # print(result)
 
             # return error if stockname is not in stocks catalog
             if result.error == pb2.INVALID_STOCKNAME:
@@ -49,17 +57,17 @@ class OrderService(pb2_grpc.OrderServicer):
             if (order_type.lower() == "buy" and result.quantity < quantity):
                 return pb2.tradeResponseMessage(error=pb2.INSUFFICIENT_QUANTITY)
             
-            # check if stockname provides is valid if request type is buy, there is enough stoc available to buy
+            # check if stockname provided is valid & if request type is buy, there is enough stock available to buy
             if result.error == pb2.NO_ERROR and ((order_type.lower() == "buy" and int(result.quantity) >= quantity) or (order_type.lower() == "sell")):
                 # make grpc call to catalog service to cary out trade operation 
                 status = catalogService.buy_or_sell_stock(pb2.orderRequestMessage(stockname=stockname, quantity=quantity, type=order_type))
-                print(status.error)
+                # print(status.error)
                 # If no error proceed with generating transaction number and logging the transaction
                 if status.error == pb2.NO_ERROR:
                     with self.lock.gen_wlock() as wlock:
                         transaction_number  += 1
                         # open log file and append the latest transaction to it
-                        with open("./data/transaction_logs.txt", "a") as transaction_logs:
+                        with open("../data/transaction_logs.txt", "a") as transaction_logs:
                             transaction_str = str(f"{transaction_number} - Stockname: {stockname}  Quantity: {quantity} Order: {order_type}, \n")
                             transaction_logs.write(transaction_str)
                         # send appropriate error code (for no error) and transaction number back to front end server

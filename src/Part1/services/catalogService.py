@@ -18,11 +18,11 @@ class CatalogService(pb2_grpc.CatalogServicer):
     def __init__(self) -> None:
         self.lock = rwlock.RWLockRead()
         # load data
-        self.data_file = pd.read_csv("./data/stock_data.csv")
+        self.data_file = pd.read_csv("../data/stock_data.csv")
 
     def lookup(self, request, context):
         try:
-            print("Inside lookup method")
+            # print("Inside lookup method")
             stockname = request.stockname
             # acquire read lock
             read_lock = self.lock.gen_rlock()
@@ -33,7 +33,7 @@ class CatalogService(pb2_grpc.CatalogServicer):
                     name = stockname
                     price =  self.data_file[stockname][0]
                     quantity = self.data_file[stockname][1]
-                print(name, price, quantity)
+                # print(name, price, quantity)
 
                 return pb2.lookupResponseMessage(error=pb2.NO_ERROR, stockname=name, price=price, quantity=int(quantity))
             else:
@@ -46,8 +46,7 @@ class CatalogService(pb2_grpc.CatalogServicer):
             stockname = request.stockname
             quantity = int(request.quantity)
             order_type = request.type
-
-            print("Inside catalog service's buy or sell method")
+            # print("Inside catalog service's buy or sell method")
 
             # acquire write lock
             write_lock = self.lock.gen_wlock()
@@ -56,37 +55,34 @@ class CatalogService(pb2_grpc.CatalogServicer):
                 try:
                     # reduce quantity of stock volume (in server's data)   
                     with write_lock: 
-                        self.data_file[stockname][1] -= quantity
-                        print(self.data_file[stockname][1], stockname)
+                        if self.data_file[stockname][1] >= quantity:
+                            self.data_file[stockname][1] -= quantity
+                        else:
+                            return pb2.orderResponseMessage(error=pb2.INSUFFICIENT_QUANTITY)
                         # presist data
                         try:
-                            self.data_file.to_csv('./data/stock_data.csv', sep=",", index=False)
-                            print("persisted data !!")
+                            self.data_file.to_csv('../data/stock_data.csv', sep=",", index=False)
                         except:
                             print("Error writing data to file")
-                    print("try buying stock")
-                    print(f"Buy request successful for {quantity} stocks of {stockname} for $ {(quantity*self.data_file[stockname][0])}.") 
+                    # print(f"Buy request successful for {quantity} stocks of {stockname} for $ {(quantity*self.data_file[stockname][0])}.") 
                     return pb2.orderResponseMessage(error=pb2.NO_ERROR)
                 except:
-                    print(f"Error occured processing request for buying {quantity} {stockname} stocks")
+                    # print(f"Error occured processing request for buying {quantity} {stockname} stocks")
                     return pb2.orderResponseMessage(error=pb2.INTERNAL_ERROR)
             elif order_type.lower() == "sell":
                 try:
                     # reduce quantity of stock volume (in server's data)   
-                    print("try selling stock")
                     with write_lock:
                         self.data_file[stockname][1] += quantity
                         # persist data
                         try:
-                            self.data_file.to_csv('./data/stock_data.csv', sep=",", index=False)
-                            print("persisted data !!")
+                            self.data_file.to_csv('../data/stock_data.csv', sep=",", index=False)    
                         except:
                             print("Error persisting data")
-                     
-                    print(f"Sell request successful for {quantity} stocks of {stockname} for $ {(quantity*self.data_file[stockname][0])}.") 
+                    # print(f"Sell request successful for {quantity} stocks of {stockname} for $ {(quantity*self.data_file[stockname][0])}.") 
                     return pb2.orderResponseMessage(error=pb2.NO_ERROR)
                 except:
-                    print(f"Error occured processing request for selling {quantity} {stockname} stocks")
+                    # print(f"Error occured processing request for selling {quantity} {stockname} stocks")
                     return pb2.orderResponseMessage(error=pb2.INTERNAL_ERROR)
                 
 def serve(port=6000, max_workers=MAX_WORKER_THRESHOLD):
