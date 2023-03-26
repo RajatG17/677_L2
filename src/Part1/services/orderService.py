@@ -92,6 +92,8 @@ def serve(host="[::]", port=6001, max_workers = MAX_WORKER_THRESHOLD):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
     pb2_grpc.add_OrderServicer_to_server(OrderService(), server)
     server.add_insecure_port(f'{host}:{port}')
+    print ("Order service running on:")
+    print(host, port)
     server.start()
     server.wait_for_termination()             
     

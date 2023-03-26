@@ -4,6 +4,9 @@ from sys import argv
 import random
 import http.client
 
+def decode_response (response):
+	return json.loads(response.decode('utf-8'))
+
 if __name__ == "__main__":
 	if (len(argv) >= 2 and len(argv) <= 4):
 		if (len(argv) == 2):
@@ -25,18 +28,22 @@ if __name__ == "__main__":
 		trade_types = ["buy", "sell"]
 
 		while (True):
+			# Send Lookup request
 			name = stock_names[random.randint(0, 3)]
+			print ("Sending Lookup request..")
+			url = "/stocks/" + name
+			conn.request("GET", url)						
+			response = conn.getresponse()
+			data = response.read()
+			print("response.status, response.reason, response.version : ")
+			print(response.status, response.reason, response.version)
+			data_json_obj = decode_response(data)
+			print ("data: ")
+			print(data_json_obj)
+			stock_quantity = int(data_json_obj['data']['quantity'])
+			print ("Stock Quantity: " + str(stock_quantity))
 			prob = random.random()
-			if (prob <= p):
-				# Send Lookup request
-				print ("Sending Lookup request..")
-				url = "/stocks/" + name
-				conn.request("GET", url)						
-				response = conn.getresponse()
-				data = response.read()
-				print("response.status, response.reason, response.version : ")
-				print(response.status, response.reason, response.version)
-			else:
+			if (stock_quantity > 0 and prob <= p):
 				# Send Trade request
 				print ("Sending Trade request..")
 				url = "/orders"
@@ -51,7 +58,8 @@ if __name__ == "__main__":
 				print("response.status, response.reason, response.version : ")
 				print(response.status, response.reason, response.version)
 				print("data: ")
-				print(data)
+				data_json_obj = decode_response(data)
+				print(data_json_obj)
 		# Close the HTTP connection
 		conn.close()
 	else:

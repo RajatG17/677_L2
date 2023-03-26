@@ -93,8 +93,9 @@ def serve(hostname="[::]", port=6000, max_workers=MAX_WORKER_THRESHOLD):
     print(MAX_WORKER_THRESHOLD)
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
     pb2_grpc.add_CatalogServicer_to_server(CatalogService(), server)
-    print(hostname, port)
     server.add_insecure_port(f'{hostname}:{port}')
+    print ("Catalog service running on:")
+    print (f'{hostname}:{port}')
     server.start()
 
     server.wait_for_termination()

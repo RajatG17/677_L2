@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 import json
 from sys import argv
 import threading
+import os
 
 class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 	protocol_version = 'HTTP/1.1'
@@ -35,7 +36,9 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 	def do_GET(self):
 		# create channel for communicating with catalog service
 		try:
-			self.catalog_channel = grpc.insecure_channel("[::]:6000")
+			catalog_host = os.getenv("CATALOG_HOST", "catalog")
+			catalog_port = os.getenv("CATALOG_PORT", "6000") 
+			self.catalog_channel = grpc.insecure_channel(f"{catalog_host}:{catalog_port}")
 		except:
 			print("Error establishing a channel with catalog service")
 
@@ -78,7 +81,9 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 	def do_POST(self):
 		# create channel for communicating with order service
 		try:
-			self.order_channel = grpc.insecure_channel("[::]:6001")
+			order_host = os.getenv("ORDER_HOST", "order")
+			order_port = os.getenv("ORDER_PORT", "6001")
+			self.order_channel = grpc.insecure_channel(f"{order_host}:{order_port}")
 		except:
 			print("Error establishing a channel with order service")
 
