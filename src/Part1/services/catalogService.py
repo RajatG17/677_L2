@@ -1,12 +1,16 @@
 import sys
 sys.path.append("..")
 
-import pandas as pd
 import grpc
+import os
+import pandas as pd
 from concurrent import futures
 from proto import service_rpc_pb2_grpc as pb2_grpc
 from proto import service_rpc_pb2 as pb2
 from readerwriterlock import rwlock
+
+# os.environ["CATALOG_HOST"] = "localhost"
+
 
 # Maximum worker threshold for threadpool (default valuw is 3)
 MAX_WORKER_THRESHOLD = 3
@@ -85,11 +89,12 @@ class CatalogService(pb2_grpc.CatalogServicer):
                     # print(f"Error occured processing request for selling {quantity} {stockname} stocks")
                     return pb2.orderResponseMessage(error=pb2.INTERNAL_ERROR)
                 
-def serve(port=6000, max_workers=MAX_WORKER_THRESHOLD):
+def serve(hostname="[::]", port=6000, max_workers=MAX_WORKER_THRESHOLD):
     print(MAX_WORKER_THRESHOLD)
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
     pb2_grpc.add_CatalogServicer_to_server(CatalogService(), server)
-    server.add_insecure_port(f'[::]:{port}')
+    print(hostname, port)
+    server.add_insecure_port(f'{hostname}:{port}')
     server.start()
 
     server.wait_for_termination()
@@ -97,9 +102,12 @@ def serve(port=6000, max_workers=MAX_WORKER_THRESHOLD):
 
 
 if __name__=="__main__":
-    if len(sys.argv) > 1:
-        MAX_WORKER_THRESHOLD = sys.argv[1]
+    if len(sys.argv) >= 2 :
+        MAX_WORKER_THRESHOLD = int(sys.argv[1])
 
-    serve()
+    host = os.getenv("CATALOG_HOST", "catalog")
+    port = os.getenv("CATALOG_PORT", 6000)
+    
+    serve(host, port)
 
 

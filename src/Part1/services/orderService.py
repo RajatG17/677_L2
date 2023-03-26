@@ -2,6 +2,7 @@ import sys
 sys.path.append("..")
 
 import grpc
+import os
 from concurrent import futures
 from proto import service_rpc_pb2_grpc as pb2_grpc
 from proto import service_rpc_pb2 as pb2 
@@ -10,6 +11,9 @@ from readerwriterlock import rwlock
 MAX_WORKER_THRESHOLD = 3
 #unique trtansaction for every order
 transaction_number = 0
+
+# os.environ["ORDER_HOST"] = "localhost"
+# os.environ["CATALOG_HOST"] = "localhost"
 
 # get last transaction number from log file if it exists
 with open("../data/transaction_logs.txt", "r") as file:
@@ -27,7 +31,9 @@ class OrderService(pb2_grpc.OrderServicer):
         self.lock = rwlock.RWLockRead()
         try:
             # create channel for communicating with catalog service
-            self.channel = grpc.insecure_channel("[::]:6000")
+            catalog_hostname = os.getenv('CATALOG_HOST', 'catalog')
+            catalog_port = os.getenv('CATALOG_PORT', 6000)
+            self.channel = grpc.insecure_channel(f"{catalog_hostname}:{catalog_port}")
         except:
             print("Error establishing a channel with catalog service")
 
@@ -81,17 +87,21 @@ class OrderService(pb2_grpc.OrderServicer):
             return pb2.tradeResponseMessage(error=pb2.INTERNAL_ERROR)
 
 
-def serve(port=6001, max_workers = MAX_WORKER_THRESHOLD):
+def serve(host="[::]", port=6001, max_workers = MAX_WORKER_THRESHOLD):
     print(MAX_WORKER_THRESHOLD)
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
     pb2_grpc.add_OrderServicer_to_server(OrderService(), server)
-    server.add_insecure_port(f'[::]:{port}')
+    server.add_insecure_port(f'{host}:{port}')
     server.start()
     server.wait_for_termination()             
     
 if __name__=="__main__":
-    if len(sys.argv) > 1:
-        MAX_WORKER_THRESHOLD = sys.argv[1]
 
-    serve()
+    if len(sys.argv) >= 2 :
+        MAX_WORKER_THRESHOLD = int(sys.argv[1])
+
+    host = os.getenv("ORDER_HOST", "order")
+    port = os.getenv("ORDER_PORT", 6001)
+    
+    serve(host, port)
         
