@@ -13,8 +13,8 @@ MAX_WORKER_THRESHOLD = 3
 #unique transaction for every order
 transaction_number = 0
 
-os.environ["ORDER_HOST"] = "localhost"
-os.environ["CATALOG_HOST"] = "localhost"
+# os.environ["ORDER_HOST"] = "localhost"
+# os.environ["CATALOG_HOST"] = "localhost"
 
 # get last transaction number from log file if it exists
 with open("../data/transaction_logs.txt", "r") as file:
@@ -48,7 +48,7 @@ class OrderService(pb2_grpc.OrderServicer):
             order_type = request.type
 
             # return error order type is invalid (other than buy/sell)
-            if order_type.lower() not in ["buy", "sell"] or quantity <= 0:
+            if order_type.lower() not in ["buy", "sell"]:
                 return pb2.tradeResponseMessage(error=pb2.INVALID_REQUEST)
 
             catalogService = pb2_grpc.CatalogStub(self.channel)
