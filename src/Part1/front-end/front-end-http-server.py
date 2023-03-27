@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.append("..")
 
@@ -37,7 +38,7 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 		# create channel for communicating with catalog service
 		try:
 			catalog_host = os.getenv("CATALOG_HOST", "catalog")
-			catalog_port = os.getenv("CATALOG_PORT", "6000") 
+			catalog_port = int(os.getenv("CATALOG_PORT", 6000)) 
 			self.catalog_channel = grpc.insecure_channel(f"{catalog_host}:{catalog_port}")
 		except:
 			print("Error establishing a channel with catalog service")
@@ -82,7 +83,7 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 		# create channel for communicating with order service
 		try:
 			order_host = os.getenv("ORDER_HOST", "order")
-			order_port = os.getenv("ORDER_PORT", "6001")
+			order_port = int(os.getenv("ORDER_PORT", 6001))
 			self.order_channel = grpc.insecure_channel(f"{order_host}:{order_port}")
 		except:
 			print("Error establishing a channel with order service")
@@ -135,21 +136,8 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
 
-	if (len(argv) >= 1 and len(argv) <= 3): 
-		if len(argv) == 1:
-			host = '127.0.0.1'
-			port = 4000
-		elif len(argv) == 2:
-			host = '127.0.0.1'
-			port=int(argv[1])
-		elif len(argv) == 3:
-			host = argv[1]
-			port=int(argv[2])
-		print("Running Front-End Service on host: " + host + " , port:" + str(port))
-		http_server = ThreadingHTTPServer((host, port), MyHTTPHandlerClass)
-		http_server.serve_forever()
-	else:
-		print ("Invalid arguments") 
-		print ("To run on a given host and port enter command: \"python3 front-end-http-server.py <host> <port>\"")
-		print ("To run on localhost on a given port enter command: \"python3 front-end-http-server.py <port>\"")
-		print ("To run on localhost and default port 4000 enter command: \"python3 front-end-http-server.py\"")
+	frontend_host = os.getenv("FRONTEND_HOST", "0.0.0.0")
+	frontend_port = int(os.getenv("FRONTEND_PORT", 4000))
+	print("Running Front-End Service on host: " + frontend_host + " , port:" + str(frontend_port))
+	http_server = ThreadingHTTPServer((frontend_host, frontend_port), MyHTTPHandlerClass)
+	http_server.serve_forever()

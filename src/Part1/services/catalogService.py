@@ -89,7 +89,7 @@ class CatalogService(pb2_grpc.CatalogServicer):
                     # print(f"Error occured processing request for selling {quantity} {stockname} stocks")
                     return pb2.orderResponseMessage(error=pb2.INTERNAL_ERROR)
                 
-def serve(hostname="[::]", port=6000, max_workers=MAX_WORKER_THRESHOLD):
+def serve(hostname="127.0.0.1", port=6000, max_workers=MAX_WORKER_THRESHOLD):
     print(MAX_WORKER_THRESHOLD)
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
     pb2_grpc.add_CatalogServicer_to_server(CatalogService(), server)
@@ -103,12 +103,11 @@ def serve(hostname="[::]", port=6000, max_workers=MAX_WORKER_THRESHOLD):
 
 
 if __name__=="__main__":
-    if len(sys.argv) >= 2 :
-        MAX_WORKER_THRESHOLD = int(sys.argv[1])
 
-    host = os.getenv("CATALOG_HOST", "catalog")
-    port = os.getenv("CATALOG_PORT", 6000)
+    # Maximum worker threshold for threadpool (default value is 3)
+    MAX_WORKER_THRESHOLD = os.getenv("MAX_WORKER_THRESHOLD_CATALOG", 3)
+    host = os.getenv("CATALOG_HOST", "0.0.0.0")
+    port = int(os.getenv("CATALOG_PORT", 6000))
     
     serve(host, port)
-
 

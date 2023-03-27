@@ -8,8 +8,9 @@ from proto import service_rpc_pb2_grpc as pb2_grpc
 from proto import service_rpc_pb2 as pb2 
 from readerwriterlock import rwlock
 
+# Maximum worker threshold for threadpool (default value is 3)
 MAX_WORKER_THRESHOLD = 3
-#unique trtansaction for every order
+#unique transaction for every order
 transaction_number = 0
 
 # os.environ["ORDER_HOST"] = "localhost"
@@ -32,7 +33,7 @@ class OrderService(pb2_grpc.OrderServicer):
         try:
             # create channel for communicating with catalog service
             catalog_hostname = os.getenv('CATALOG_HOST', 'catalog')
-            catalog_port = os.getenv('CATALOG_PORT', 6000)
+            catalog_port = int(os.getenv('CATALOG_PORT', 6000))
             self.channel = grpc.insecure_channel(f"{catalog_hostname}:{catalog_port}")
         except:
             print("Error establishing a channel with catalog service")
@@ -87,7 +88,7 @@ class OrderService(pb2_grpc.OrderServicer):
             return pb2.tradeResponseMessage(error=pb2.INTERNAL_ERROR)
 
 
-def serve(host="[::]", port=6001, max_workers = MAX_WORKER_THRESHOLD):
+def serve(host="127.0.0.1", port=6001, max_workers = MAX_WORKER_THRESHOLD):
     print(MAX_WORKER_THRESHOLD)
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
     pb2_grpc.add_OrderServicer_to_server(OrderService(), server)
@@ -99,11 +100,10 @@ def serve(host="[::]", port=6001, max_workers = MAX_WORKER_THRESHOLD):
     
 if __name__=="__main__":
 
-    if len(sys.argv) >= 2 :
-        MAX_WORKER_THRESHOLD = int(sys.argv[1])
-
-    host = os.getenv("ORDER_HOST", "order")
-    port = os.getenv("ORDER_PORT", 6001)
+    MAX_WORKER_THRESHOLD = os.getenv("MAX_WORKER_THRESHOLD_ORDER", 3)
+    host = os.getenv("ORDER_HOST", "0.0.0.0")
+    port = int(os.getenv("ORDER_PORT", 6001))
+    print ("Running order service on host: " + host + " , port: " + str(port))
     
     serve(host, port)
         
