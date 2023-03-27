@@ -40,8 +40,11 @@ if __name__ == "__main__":
 			data_json_obj = decode_response(data)
 			print ("data: ")
 			print(data_json_obj)
-			stock_quantity = int(data_json_obj['data']['quantity'])
-			print ("Stock Quantity: " + str(stock_quantity))
+			if data_json_obj.get("data", 0):
+				stock_quantity = int(data_json_obj['data']['quantity'])
+				print ("Stock Quantity: " + str(stock_quantity))
+			else:
+				stock_quantity = 0
 			prob = random.random()
 			if (stock_quantity > 0 and prob <= p):
 				# Send Trade request

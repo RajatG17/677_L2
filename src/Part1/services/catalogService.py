@@ -84,6 +84,7 @@ class CatalogService(pb2_grpc.CatalogServicer):
                 except:
                     # print(f"Error occured processing request for selling {quantity} {stockname} stocks")
                     return pb2.orderResponseMessage(error=pb2.INTERNAL_ERROR)
+            return pb2.orderResponseMessage(error=pb2.INTERNAL_ERROR)    
                 
 def serve(hostname="127.0.0.1", port=6000, max_workers=MAX_WORKER_THRESHOLD):
     print(MAX_WORKER_THRESHOLD)

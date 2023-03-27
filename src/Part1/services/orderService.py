@@ -45,7 +45,7 @@ class OrderService(pb2_grpc.OrderServicer):
             order_type = request.type
 
             # return error order type is invalid (other than buy/sell)
-            if order_type.lower() not in ["buy", "sell"]:
+            if order_type.lower() not in ["buy", "sell"] or quantity <= 0:
                 return pb2.tradeResponseMessage(error=pb2.INVALID_REQUEST)
 
             catalogService = pb2_grpc.CatalogStub(self.channel)
