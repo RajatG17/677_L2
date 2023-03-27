@@ -6,6 +6,7 @@ services:
       dockerfile: ./frontend.Dockerfile
     ports:
       - "4000:4000"
+    container_name: front-end-container
     depends_on:
       - catalog
       - order
@@ -13,12 +14,14 @@ services:
     build:
       context: .
       dockerfile: ./catalog.Dockerfile 
+    container_name: catalog-container
     volumes:
       - ./src/Part1/data:/root-dir/data
   order:
     build:
       context: .
       dockerfile: ./order.Dockerfile
+    container_name: order-container
     volumes:
       - ./src/Part1/data:/root-dir/data
     depends_on:
