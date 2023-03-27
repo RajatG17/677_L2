@@ -24,13 +24,14 @@ if __name__ == "__main__":
 		
 		print ("Client establishing server connection at host: " + host + " , port: " + str(port))
 		conn = http.client.HTTPConnection(host, port)
-		stock_names = ["GameStart", "FishCo", "MenhirCo", "BoarCo"]
+		stock_names = ["GameStart", "FishCo", "MenhirCo", "BoarCo", "InvalidStockName"]
 		trade_types = ["buy", "sell"]
 
 		while (True):
 			# Send Lookup request
-			name = stock_names[random.randint(0, 3)]
-			print ("Sending Lookup request..")
+			name = stock_names[random.randint(0, len(stock_names)-1)]
+			print ("Sending Lookup request for stockname: " + name)
+			#url = "/stockss/" + name
 			url = "/stocks/" + name
 			conn.request("GET", url)						
 			response = conn.getresponse()
@@ -41,9 +42,11 @@ if __name__ == "__main__":
 			print ("data: ")
 			print(data_json_obj)
 			if data_json_obj.get("data", 0):
+				# If the lookup was succesful and client received JSON reply with top-level data object
 				stock_quantity = int(data_json_obj['data']['quantity'])
 				print ("Stock Quantity: " + str(stock_quantity))
 			else:
+				# If the lookup failed, set the "stock_quantity" as 0, so that trade request is not sent for this failed lookup
 				stock_quantity = 0
 			prob = random.random()
 			if (stock_quantity > 0 and prob <= p):
@@ -51,6 +54,9 @@ if __name__ == "__main__":
 				print ("Sending Trade request..")
 				url = "/orders"
 				type = trade_types[random.randint(0, 1)]
+				#type = "invalid"
+				#body_json = {"name": name, "quantity": 400000, "type": type}
+				#body_json = {"name": name, "quantity": 1}
 				body_json = {"name": name, "quantity": 1, "type": type}
 				json_str = json.dumps(body_json)
 				body = json_str.encode('utf-8')	

@@ -74,9 +74,9 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 			print ("URL for HTTP GET request is invalid - It should be of the format : ") 
 			print("\"/stocks/<stock_name>\"")
 			# If the GET request was not successful, return JSON reply with a top-level error object
-			json_str = json.dumps({"error": {"code": 404, "message": "stock not found"}})
+			json_str = json.dumps({"error": {"code": 400, "message": "Invalid GET request/URL"}})
 			response = self.convert_json_string(json_str)
-			self.create_and_send_response(404, "application/json", str(len(response)), response)
+			self.create_and_send_response(400, "application/json", str(len(response)), response)
 			return
 		
 		# Obtain the stockname from the parsed URL/path
@@ -96,11 +96,16 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 			json_str = json.dumps({"data": {"name": stockname, "price": price, "quantity": quantity}})
 			response = self.convert_json_string(json_str)
 			self.create_and_send_response(200, "application/json", str(len(response)), response)
-		else:
-			#If the GET request was not successful, return JSON reply with a top-level error object
+		elif result.error == pb2.INVALID_STOCKNAME:
+			#If the GET request was not successful due to invalid stockname, return JSON reply with a top-level error object
 			json_str = json.dumps({"error": {"code": 404, "message": "stock not found"}})
 			response = self.convert_json_string(json_str)
-			self.create_and_send_response(404, "application/json", str(len(response)), response) 
+			self.create_and_send_response(404, "application/json", str(len(response)), response)
+		else:			
+			#If the GET request was not successful due to any other error, return JSON reply with a top-level error object
+			json_str = json.dumps({"error": {"code": 500, "message": "Lookup Failed due to internal error"}})
+			response = self.convert_json_string(json_str)
+			self.create_and_send_response(500, "application/json", str(len(response)), response) 
 
 	def do_POST(self):
 		"""
@@ -112,25 +117,30 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 		except:
 			print("Error establishing a channel with order service")
 		"""
-		
-		 # Check if the URL for the POST method is invalid - It should be of the format : "/orders"
+
+		# Read the JSON object attached by the client to the POST request
+		length = int(self.headers["Content-Length"])
+		request = json.loads(self.rfile.read(length).decode('utf-8'))
+				
+		# Check if the URL for the POST method is invalid - It should be of the format : "/orders"
 		if self.path != "/orders":
 			print ("URL for HTTP POST request is invalid - It should be of the format : ")
 			print("\"/orders\"")
 			#If the POST request was not successful, return JSON reply with a top-level error object
-			json_str = json.dumps({"error": {"code": 400, "message": "stock could not be traded"}})
+			json_str = json.dumps({"error": {"code": 400, "message": "Invalid POST request/URL"}})
 			response = self.convert_json_string(json_str)
 			self.create_and_send_response(400, "application/json", str(len(response)), response)
 			return
-	
+		"""
 		# Read the JSON object attached by the client to the POST request
 		length = int(self.headers["Content-Length"])
 		request = json.loads(self.rfile.read(length).decode('utf-8'))
+		"""
 
 		if (self.headers["Content-type"] != "application/json" or "name" not in request or "quantity" not in request or "type" not in request):
 			print ("Invalid POST request - JSON object should contain the keys \"name\", \"quantity\" and \"type\"")
 			#If the POST request was not successful, return JSON reply with a top-level error object
-			json_str = json.dumps({"error": {"code": 400, "message": "stock could not be traded"}})
+			json_str = json.dumps({"error": {"code": 400, "message": "Invalid request- JSON object should contain name, quantity and type"}})
 			response = self.convert_json_string(json_str)
 			self.create_and_send_response(400, "application/json", str(len(response)), response)
 			return
@@ -153,11 +163,25 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 			json_str = json.dumps({"data": {"transaction_number": transaction_number}})
 			response = self.convert_json_string(json_str)
 			self.create_and_send_response(200, "application/json", str(len(response)), response)
+		elif result.error == pb2.INVALID_REQUEST:
+			#If the POST request was not successful, return JSON reply with a top-level error object
+			json_str = json.dumps({"error": {"code": 400, "message": "Order type is invalid, only buy/sell are accepted"}})
+			response = self.convert_json_string(json_str)
+			self.create_and_send_response(400, "application/json", str(len(response)), response)
+		elif result.error == pb2.INVALID_STOCKNAME:
+			#If the POST request was not successful due to invalid stockname, return JSON reply with a top-level error object
+			json_str = json.dumps({"error": {"code": 404, "message": "stock not found"}})
+			response = self.convert_json_string(json_str)
+			self.create_and_send_response(404, "application/json", str(len(response)), response)
+		elif result.error == pb2.INSUFFICIENT_QUANTITY:
+			json_str = json.dumps({"error": {"code": 400, "message": "Available quantity to buy is less than requested quantity"}})
+			response = self.convert_json_string(json_str)
+			self.create_and_send_response(400, "application/json", str(len(response)), response)
 		else:
 			#If the POST request was not successful, return JSON reply with a top-level error object
-			json_str = json.dumps({"error": {"code": 400, "message": "stock could not be traded"}})
+			json_str = json.dumps({"error": {"code": 500, "message": "Stock could not be traded due to internal error"}})
 			response = self.convert_json_string(json_str) 
-			self.create_and_send_response(400, "application/json", str(len(response)), response)
+			self.create_and_send_response(500, "application/json", str(len(response)), response)
 
 if __name__ == "__main__":
 
