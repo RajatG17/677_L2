@@ -13,9 +13,6 @@ MAX_WORKER_THRESHOLD = 3
 #unique transaction for every order
 transaction_number = 0
 
-# os.environ["ORDER_HOST"] = "localhost"
-# os.environ["CATALOG_HOST"] = "localhost"
-
 # get last transaction number from log file if it exists
 with open("../data/transaction_logs.txt", "r") as file:
     try:

@@ -9,12 +9,8 @@ from proto import service_rpc_pb2_grpc as pb2_grpc
 from proto import service_rpc_pb2 as pb2
 from readerwriterlock import rwlock
 
-# os.environ["CATALOG_HOST"] = "localhost"
-
-
 # Maximum worker threshold for threadpool (default valuw is 3)
 MAX_WORKER_THRESHOLD = 3
-
 
 # Catalog service server class to carry out lookup and trade operations with backend(file)
 class CatalogService(pb2_grpc.CatalogServicer):
