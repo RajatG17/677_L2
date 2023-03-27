@@ -16,6 +16,27 @@ import os
 class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 	protocol_version = 'HTTP/1.1'
 
+	def __init__(self, request, client_address, server):
+		# create channel for communicating with catalog service
+		try:
+			catalog_host = os.getenv("CATALOG_HOST", "catalog")
+			catalog_port = int(os.getenv("CATALOG_PORT", 6000))
+			print ("Connecting to catalog service at host:" + catalog_host + " ,port: " + str(catalog_port))
+			self.catalog_channel = grpc.insecure_channel(f"{catalog_host}:{catalog_port}")
+		except:
+			print("Error establishing a channel with catalog service")
+
+		# create channel for communicating with order service
+		try:
+			order_host = os.getenv("ORDER_HOST", "order")
+			order_port = int(os.getenv("ORDER_PORT", 6001))
+			print ("Connecting to order service at host:" + order_host + " ,port: " + str(order_port))
+			self.order_channel = grpc.insecure_channel(f"{order_host}:{order_port}")
+			
+		except:
+			print("Error establishing a channel with order service")
+		super().__init__(request, client_address, server)
+
 	def handle_one_request(self):
 		super(MyHTTPHandlerClass, self).handle_one_request()
 		print ("cur_thread: " + threading.current_thread().name)
@@ -35,6 +56,7 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 		self.wfile.write(response)
 
 	def do_GET(self):
+		"""
 		# create channel for communicating with catalog service
 		try:
 			catalog_host = os.getenv("CATALOG_HOST", "catalog")
@@ -42,6 +64,7 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 			self.catalog_channel = grpc.insecure_channel(f"{catalog_host}:{catalog_port}")
 		except:
 			print("Error establishing a channel with catalog service")
+		"""
 
 		get_path = str(self.path)
 		parsed_path = get_path.split("/")
@@ -80,6 +103,7 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 			self.create_and_send_response(404, "application/json", str(len(response)), response) 
 
 	def do_POST(self):
+		"""
 		# create channel for communicating with order service
 		try:
 			order_host = os.getenv("ORDER_HOST", "order")
@@ -87,7 +111,8 @@ class MyHTTPHandlerClass(http.server.BaseHTTPRequestHandler):
 			self.order_channel = grpc.insecure_channel(f"{order_host}:{order_port}")
 		except:
 			print("Error establishing a channel with order service")
-
+		"""
+		
 		 # Check if the URL for the POST method is invalid - It should be of the format : "/orders"
 		if self.path != "/orders":
 			print ("URL for HTTP POST request is invalid - It should be of the format : ")
