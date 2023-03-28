@@ -1,5 +1,41 @@
 # Instructions to run 
 
+## PART 1:
+
+1. Run the catalog service in the services/ folder:
+
+```shell
+python3 catalogService.py
+```
+
+2. Run the order service in the services/ folder with the environment variable "CATALOG_HOST" set as "0.0.0.0":
+
+```shell
+CATALOG_HOST="0.0.0.0" python3 orderService.py
+```
+
+3. Run the front-end service in the front-end/ fodler with the environment variable "CATALOG_HOST"="0.0.0.0" and ORDER_HOST="0.0.0.0"
+
+```shell
+CATALOG_HOST="0.0.0.0" ORDER_HOST="0.0.0.0" python3 front-end-http-server.py
+```
+
+4. Run client in the client/ folder:
+
+```shell
+python3 client.py 0.4
+```
+
+Note:
+The client takes host and port of the server as command line arguments:
+python3 client.py <host> <port> <p>
+
+In order to connect a client on the local machine to a remote host say "128.119.243.147", run:
+
+```shell
+python3 client.py "128.119.243.147" 4000 0.4
+```
+
 ## PART 2:
 
 ### Build and run all the services using Dockerfile:
