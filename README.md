@@ -4,7 +4,7 @@ Compsci 677: Distributed and Operating Systems
 Spring 2023
 
 # Lab 2: Asterix and the Microservice Stock Bazaar
-LAB done by Shreya Dubey (shreyadubey@umass.edu) and Rajat Gade (rgade@umass.edu)
+LAB 2 done by Shreya Dubey (shreyadubey@umass.edu) and Rajat Gade (rgade@umass.edu)
 
 ## Goals and Learning Outcomes
 
@@ -28,6 +28,7 @@ The lab also has the following learning outcomes with regards to practice and mo
 3. Number of late days used for this lab: 0
 4. Number of late days used so far including this lab: 1
 
+Part1 done by Shreya and Rajat, Part2 done by Shreya, Part3 done by Rajat
 
 ## Instructions
 
