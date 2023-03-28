@@ -102,5 +102,5 @@ if __name__=="__main__":
     port = int(os.getenv("ORDER_PORT", 6001))
     print ("Running order service on host: " + host + " , port: " + str(port))
     
-    serve(host, port)
+    serve(host, port, MAX_WORKER_THRESHOLD)
         

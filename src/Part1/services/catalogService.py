@@ -9,7 +9,7 @@ from proto import service_rpc_pb2_grpc as pb2_grpc
 from proto import service_rpc_pb2 as pb2
 from readerwriterlock import rwlock
 
-# Maximum worker threshold for threadpool (default valuw is 3)
+# Maximum worker threshold for threadpool (default value is 3)
 MAX_WORKER_THRESHOLD = 3
 
 # Catalog service server class to carry out lookup and trade operations with backend(file)
@@ -106,5 +106,5 @@ if __name__=="__main__":
     host = os.getenv("CATALOG_HOST", "0.0.0.0")
     port = int(os.getenv("CATALOG_PORT", 6000))
     
-    serve(host, port)
+    serve(host, port, MAX_WORKER_THRESHOLD)
 
