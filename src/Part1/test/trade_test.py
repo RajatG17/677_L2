@@ -50,7 +50,7 @@ if __name__ == "__main__":
         data = response.read()
         response_time = time.time() - start
         tot_time += response_time
-
+    # calculate average trade time
     avg_time = tot_time/200
 
     print(f"Average trade time: {avg_time*1000}ms")

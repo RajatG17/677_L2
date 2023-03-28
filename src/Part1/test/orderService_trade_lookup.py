@@ -52,7 +52,7 @@ def order_invalid_name_request():
 
     with channel:
         orderStub = pb2_grpc.OrderStub(channel)
-        # test trade method by sending correct methods
+        # test trade method by sending incorrect names
         result = orderStub.trade(pb2.tradeRequestMessage(stockname=stock_names[random.randint(0, 3)], quantity=quantity, type=type))
 
         print("Test sending invalid stockname: ", result)
