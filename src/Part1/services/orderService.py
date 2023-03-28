@@ -85,7 +85,7 @@ class OrderService(pb2_grpc.OrderServicer):
             return pb2.tradeResponseMessage(error=pb2.INTERNAL_ERROR)
 
 
-def serve(host="127.0.0.1", port=6001, max_workers = MAX_WORKER_THRESHOLD):
+def serve(host="0.0.0.0", port=6001, max_workers=MAX_WORKER_THRESHOLD):
     print(MAX_WORKER_THRESHOLD)
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
     pb2_grpc.add_OrderServicer_to_server(OrderService(), server)
@@ -97,7 +97,7 @@ def serve(host="127.0.0.1", port=6001, max_workers = MAX_WORKER_THRESHOLD):
     
 if __name__=="__main__":
 
-    MAX_WORKER_THRESHOLD = os.getenv("MAX_WORKER_THRESHOLD_ORDER", 3)
+    MAX_WORKER_THRESHOLD = int(os.getenv("MAX_WORKER_THRESHOLD_ORDER", 3))
     host = os.getenv("ORDER_HOST", "0.0.0.0")
     port = int(os.getenv("ORDER_PORT", 6001))
     print ("Running order service on host: " + host + " , port: " + str(port))
