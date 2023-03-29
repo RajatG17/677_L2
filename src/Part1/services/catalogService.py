@@ -56,8 +56,12 @@ class CatalogService(pb2_grpc.CatalogServicer):
                     # reduce quantity of stock volume (in server's data)   
                     with write_lock: 
                         if self.data_file[stockname][1] >= quantity:
+                            # decrement quantity available to trade
                             self.data_file[stockname][1] -= quantity
+                            # update volume of traded stock
+                            self.data_file[stockname][2] += quantity
                         else:
+                            # return insufficient quantity error
                             return pb2.orderResponseMessage(error=pb2.INSUFFICIENT_QUANTITY)
                         # presist data
                         try:
@@ -73,7 +77,10 @@ class CatalogService(pb2_grpc.CatalogServicer):
                 try:
                     # reduce quantity of stock volume (in server's data)   
                     with write_lock:
+                        # increment quantity available to trade
                         self.data_file[stockname][1] += quantity
+                        # update total volume of traded stock
+                        self.data_file[stockname][2] += quantity
                         # persist data
                         try:
                             self.data_file.to_csv('../data/stock_data.csv', sep=",", index=False)    
@@ -102,7 +109,7 @@ def serve(hostname="0.0.0.0", port=6000, max_workers=MAX_WORKER_THRESHOLD):
 if __name__=="__main__":
 
     # Maximum worker threshold for threadpool (default value is 3)
-    MAX_WORKER_THRESHOLD = int(os.getenv("MAX_WORKER_THRESHOLD_CATALOG", 3))
+    MAX_WORKER_THRESHOLD = int(os.getenv("MAX_WORKER_THRESHOLD_CATALOG", 5))
     host = os.getenv("CATALOG_HOST", "0.0.0.0")
     port = int(os.getenv("CATALOG_PORT", 6000))
     

@@ -97,7 +97,7 @@ def serve(host="0.0.0.0", port=6001, max_workers=MAX_WORKER_THRESHOLD):
     
 if __name__=="__main__":
 
-    MAX_WORKER_THRESHOLD = int(os.getenv("MAX_WORKER_THRESHOLD_ORDER", 3))
+    MAX_WORKER_THRESHOLD = int(os.getenv("MAX_WORKER_THRESHOLD_ORDER", 5))
     host = os.getenv("ORDER_HOST", "0.0.0.0")
     port = int(os.getenv("ORDER_PORT", 6001))
     print ("Running order service on host: " + host + " , port: " + str(port))
