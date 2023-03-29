@@ -25,8 +25,8 @@ The lab also has the following learning outcomes with regards to practice and mo
 ## Information about your submission
 1. Name and email: 1. Shreya Dubey, shreyadubey@umass.edu 2. Rajat Gade, rgade@umass.edu 
 2. Team member name and email: 1. Shreya Dubey, shreyadubey@umass.edu 2. Rajat Gade, rgade@umass.edu 
-3. Number of late days used for this lab: 0
-4. Number of late days used so far including this lab: 1
+3. Number of late days used for this lab: 1
+4. Number of late days used so far including this lab: 2
 
 Part1 done by Shreya and Rajat, Part2 done by Shreya, Part3 done by Rajat
 
